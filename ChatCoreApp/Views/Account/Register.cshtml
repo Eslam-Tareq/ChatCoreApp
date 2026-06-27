@@ -1,0 +1,211 @@
+﻿@model RegisterVM
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<style>
+    body{
+        background:linear-gradient(135deg,#4f46e5,#06b6d4);
+        min-height:100vh;
+    }
+
+    .register-card{
+        max-width:500px;
+        margin:auto;
+        margin-top:60px;
+        border:none;
+        border-radius:20px;
+        box-shadow:0 20px 50px rgba(0,0,0,.2);
+        backdrop-filter:blur(20px);
+    }
+
+    .card-header{
+        background:none;
+        border:none;
+        text-align:center;
+        padding-top:30px;
+    }
+
+    .logo{
+        width:80px;
+        height:80px;
+        background:#4f46e5;
+        color:white;
+        font-size:35px;
+        border-radius:50%;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        margin:auto;
+    }
+
+    .btn-register{
+        background:#4f46e5;
+        border:none;
+        border-radius:10px;
+        padding:12px;
+        font-weight:bold;
+        transition:.3s;
+    }
+
+    .btn-register:hover{
+        transform:translateY(-2px);
+    }
+
+    .input-group-text{
+        background:white;
+    }
+</style>
+
+<div class="container">
+
+    <div class="card register-card">
+
+        <div class="card-header">
+
+            <div class="logo">
+                <i class="bi bi-person-plus-fill"></i>
+            </div>
+
+            <h2 class="mt-3 fw-bold">
+                Create Account
+            </h2>
+
+            <p class="text-muted">
+                Register to continue
+            </p>
+
+        </div>
+
+        <div class="card-body p-4">
+
+            <form asp-action="Register" method="post">
+
+                <div asp-validation-summary="All"
+                     class="text-danger mb-3">
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="UserName" class="form-label"></label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-person"></i>
+                        </span>
+
+                        <input asp-for="UserName"
+                               class="form-control"
+                               placeholder="Username" />
+
+                    </div>
+
+                    <span asp-validation-for="UserName"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="Email"></label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+
+                        <input asp-for="Email"
+                               class="form-control"
+                               placeholder="Email" />
+
+                    </div>
+
+                    <span asp-validation-for="Email"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label asp-for="Password"></label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-lock"></i>
+                        </span>
+
+                        <input asp-for="Password"
+                               class="form-control"
+                               type="password"
+                               placeholder="Password" />
+
+                    </div>
+
+                    <span asp-validation-for="Password"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label asp-for="ConfirmPassword"></label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-shield-lock"></i>
+                        </span>
+
+                        <input asp-for="ConfirmPassword"
+                               class="form-control"
+                               type="password"
+                               placeholder="Confirm Password" />
+
+                    </div>
+
+                    <span asp-validation-for="ConfirmPassword"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <button class="btn btn-primary btn-register w-100">
+
+                    <i class="bi bi-person-check-fill"></i>
+
+                    Create Account
+
+                </button>
+
+            </form>
+
+            <div class="text-center mt-4">
+
+                Already have an account?
+
+                <a asp-action="Login">
+                    Login
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

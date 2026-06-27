@@ -1,0 +1,246 @@
+﻿@{
+    ViewData["Title"] = "Chat";
+}
+
+<div class="container mt-4">
+
+    <h2 class="text-center mb-4 fw-bold">
+        💬 Chat Dashboard
+    </h2>
+
+    <div class="row">
+
+        <div class="col-lg-4">
+
+            <!-- Create Group -->
+            <div class="card shadow mb-4">
+
+                <div class="card-header bg-primary text-white">
+                    Create Group
+                </div>
+
+                <div class="card-body">
+
+                    <input id="groupName"
+                           class="form-control mb-3"
+                           placeholder="Group Name" />
+
+                    <button class="btn btn-primary w-100"
+                            id="btnCreateGroup">
+
+                        Create Group
+
+                    </button>
+
+                </div>
+
+            </div>
+            <!-- Delete Room -->
+
+            <div class="card shadow mb-4">
+
+                <div class="card-header bg-danger text-white">
+
+                    Delete Room
+
+                </div>
+
+                <div class="card-body">
+
+                    <select id="deleteRoom"
+                            class="form-select mb-3">
+                    </select>
+
+                    <button class="btn btn-danger w-100"
+                            id="btnDeleteRoom">
+
+                        <i class="bi bi-trash"></i>
+
+                        Delete Room
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- Join Group -->
+            <div class="card shadow mb-4">
+
+                <div class="card-header bg-success text-white">
+
+                    Join Group
+
+                </div>
+
+                <div class="card-body">
+
+                    <select id="joinGroup"
+                            class="form-select mb-3">
+                    </select>
+
+                    <button class="btn btn-success w-100"
+                            id="btnJoinGroup">
+
+                        Join
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- Leave Group -->
+
+            <div class="card shadow">
+
+                <div class="card-header bg-danger text-white">
+
+                    Leave Group
+
+                </div>
+
+                <div class="card-body">
+
+                    <select id="leaveGroup"
+                            class="form-select mb-3">
+                    </select>
+
+                    <button class="btn btn-danger w-100"
+                            id="btnLeaveGroup">
+
+                        Leave
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-8">
+
+            <!-- Public Message -->
+
+            <div class="card shadow mb-4">
+
+                <div class="card-header bg-info text-white">
+
+                    Public Message
+
+                </div>
+
+                <div class="card-body">
+
+                    <select id="room"
+                            class="form-select mb-3">
+                    </select>
+
+                    <div class="input-group">
+
+                        <input id="txtGroupMessage"
+                               class="form-control"
+                               placeholder="Type message..." />
+
+                        <button class="btn btn-info"
+                                id="btnSendGroup">
+
+                            Send
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Private -->
+
+            <div class="card shadow mb-4">
+
+                <div class="card-header bg-secondary text-white">
+
+                    Private Message
+
+                </div>
+
+                <div class="card-body">
+
+                    <select id="users"
+                            class="form-select mb-3">
+                    </select>
+
+                    <div class="input-group">
+
+                        <input id="txtPrivateMessage"
+                               class="form-control"
+                               placeholder="Type message..." />
+
+                        <button class="btn btn-dark"
+                                id="btnPrivate">
+
+                            Send
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Messages -->
+
+            <div class="card shadow">
+
+                <div class="card-header">
+
+                    Messages
+
+                </div>
+
+                <div class="card-body"
+                     style="height:400px;overflow-y:auto;">
+
+                    <ul id="messages"
+                        class="list-group">
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script>
+
+        let con =new signalR.HubConnectionBuilder().withUrl("/MyChat").build();
+        con.start();
+
+        con.on("CurrentGroups",groups => {
+            console.log(groups);
+        }
+
+
+
+         con.on("AllAvaliableGroups",groups => {
+            console.log(groups);
+        }
+
+         con.on("AllUsers",users => {
+            console.log(users);
+        }
+        
+        )
+    </script>
+
+}
