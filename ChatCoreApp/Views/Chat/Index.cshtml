@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Chat";
 }
 
@@ -222,25 +222,136 @@
 
     <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
     <script>
+        let con = new signalR.HubConnectionBuilder().withUrl("/MyChat").build();
 
-        let con =new signalR.HubConnectionBuilder().withUrl("/MyChat").build();
-        con.start();
+        let allGroupsCache = [];
+        let currentGroupsCache = [];
 
-        con.on("CurrentGroups",groups => {
-            console.log(groups);
+        function populateSelect(selectId, items, valueProp, textProp, defaultText) {
+            const select = document.getElementById(selectId);
+            select.innerHTML = "";
+            if (defaultText) {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.textContent = defaultText;
+                select.appendChild(opt);
+            }
+            items.forEach(item => {
+                const opt = document.createElement("option");
+                opt.value = item[valueProp];
+                opt.textContent = item[textProp];
+                select.appendChild(opt);
+            });
         }
 
+        function refreshGroupDropdowns() {
+            // Groups the current user is in go to Delete Room, Leave Group, and Public Message select
+            populateSelect("deleteRoom", currentGroupsCache, "chatId", "name", "-- Select Room to Delete --");
+            populateSelect("leaveGroup", currentGroupsCache, "chatId", "name", "-- Select Room to Leave --");
+            populateSelect("room", currentGroupsCache, "chatId", "name", "-- Select Room to Message --");
 
-
-         con.on("AllAvaliableGroups",groups => {
-            console.log(groups);
+            // Groups the current user has NOT joined go to Join Group select
+            const joinableGroups = allGroupsCache.filter(g => !currentGroupsCache.some(cg => cg.chatId === g.chatId));
+            populateSelect("joinGroup", joinableGroups, "chatId", "name", "-- Select Room to Join --");
         }
 
-         con.on("AllUsers",users => {
-            console.log(users);
-        }
-        
-        )
+        con.on("AllAvaliableGroups", groups => {
+            console.log("AllAvaliableGroups:", groups);
+            allGroupsCache = groups;
+            refreshGroupDropdowns();
+        });
+
+        con.on("CurrentGroups", groups => {
+            console.log("CurrentGroups:", groups);
+            currentGroupsCache = groups;
+            refreshGroupDropdowns();
+        });
+
+        con.on("AllUsers", users => {
+            console.log("AllUsers:", users);
+            populateSelect("users", users, "id", "userName", "-- Select User for Private Message --");
+        });
+
+        con.on("ReceiveGroupMessage", (sender, groupName, message) => {
+            const ul = document.getElementById("messages");
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between align-items-center";
+            li.innerHTML = `<div><span class="badge bg-primary me-2">${groupName}</span><strong>${sender}:</strong> ${message}</div><small class="text-muted">${new Date().toLocaleTimeString()}</small>`;
+            ul.appendChild(li);
+            ul.parentElement.scrollTop = ul.parentElement.scrollHeight;
+        });
+
+        con.on("ReceivePrivateMessage", (sender, receiverId, message) => {
+            const ul = document.getElementById("messages");
+            const li = document.createElement("li");
+            li.className = "list-group-item list-group-item-info d-flex justify-content-between align-items-center";
+            li.innerHTML = `<div><span class="badge bg-dark me-2">🔒 Private</span><strong>${sender}:</strong> ${message}</div><small class="text-muted">${new Date().toLocaleTimeString()}</small>`;
+            ul.appendChild(li);
+            ul.parentElement.scrollTop = ul.parentElement.scrollHeight;
+        });
+
+        document.getElementById("btnCreateGroup").addEventListener("click", () => {
+            const nameInput = document.getElementById("groupName");
+            const name = nameInput.value.trim();
+            if (name) {
+                con.invoke("CreateGroup", name)
+                    .then(() => { nameInput.value = ""; })
+                    .catch(err => console.error(err));
+            }
+        });
+
+        document.getElementById("btnDeleteRoom").addEventListener("click", () => {
+            const select = document.getElementById("deleteRoom");
+            const chatId = parseInt(select.value);
+            if (chatId) {
+                con.invoke("DeleteGroup", chatId).catch(err => console.error(err));
+            }
+        });
+
+        document.getElementById("btnJoinGroup").addEventListener("click", () => {
+            const select = document.getElementById("joinGroup");
+            const chatId = parseInt(select.value);
+            if (chatId) {
+                con.invoke("JoinGroup", chatId).catch(err => console.error(err));
+            }
+        });
+
+        document.getElementById("btnLeaveGroup").addEventListener("click", () => {
+            const select = document.getElementById("leaveGroup");
+            const chatId = parseInt(select.value);
+            if (chatId) {
+                con.invoke("LeaveGroup", chatId).catch(err => console.error(err));
+            }
+        });
+
+        document.getElementById("btnSendGroup").addEventListener("click", () => {
+            const select = document.getElementById("room");
+            const msgInput = document.getElementById("txtGroupMessage");
+            const chatId = parseInt(select.value);
+            const msg = msgInput.value.trim();
+            if (chatId && msg) {
+                con.invoke("SendGroupMessage", chatId, msg)
+                    .then(() => { msgInput.value = ""; })
+                    .catch(err => console.error(err));
+            }
+        });
+
+        document.getElementById("btnPrivate").addEventListener("click", () => {
+            const select = document.getElementById("users");
+            const msgInput = document.getElementById("txtPrivateMessage");
+            const userId = select.value;
+            const msg = msgInput.value.trim();
+            if (userId && msg) {
+                con.invoke("SendPrivateMessage", userId, msg)
+                    .then(() => { msgInput.value = ""; })
+                    .catch(err => console.error(err));
+            }
+        });
+
+        con.start()
+            .then(() => console.log("Connected to SignalR hub."))
+            .catch(err => console.error("Error connecting to SignalR hub:", err));
     </script>
-
 }
+
+

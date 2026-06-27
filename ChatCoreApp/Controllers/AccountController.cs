@@ -1,4 +1,4 @@
-﻿using ChatCoreApp.Models;
+using ChatCoreApp.Models;
 using ChatCoreApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +45,7 @@ namespace ChatCoreApp.Controllers
             {
                 await _signInManager.SignInAsync(user, false);
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Chat");
             }
 
             foreach (var error in result.Errors)
@@ -81,7 +81,7 @@ namespace ChatCoreApp.Controllers
                 lockoutOnFailure: false);
 
             if (result.Succeeded)
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Chat");
 
             ModelState.AddModelError("", "Invalid Email or Password");
             return View(model);
@@ -92,7 +92,7 @@ namespace ChatCoreApp.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Chat");
         }
     }
 }
